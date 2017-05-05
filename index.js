@@ -3,10 +3,7 @@
 /**
  * This sample demonstrates a simple skill built with the Amazon Alexa Skills
  * nodejs skill development kit.
- * This sample supports multiple lauguages. (en-US, en-GB, de-DE).
- * The Intent Schema, Custom Slots and Sample Utterances for this skill, as well
- * as testing instructions are located at https://github.com/alexa/skill-sample-nodejs-fact
- **/
+  **/
 
 'use strict';
 
@@ -15,7 +12,8 @@ const Alexa = require('alexa-sdk');
 //const https = require ('https');
 const request = require('request');
 //const utils = require ('utils');
-require('date-utils');
+const moment = require('moment-timezone');
+//require('date-utils');
 const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
 
 
@@ -28,6 +26,7 @@ const handlers = {
             return;
         } else {
             this.emit(':tell', "Team snap");
+            this.emit('ListPlayers');
         }
         //this.emit('GetFact');
     },
@@ -38,9 +37,9 @@ const handlers = {
     'GetPlayers': function () {
         var accessToken = this.event.session.user.accessToken;
         var self = this; // to avoid emit failure in a deep nest
-        var dt = new Date();
+        var dt = new moment();
         //  var yesterday = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() - 1);
-        var formatteddt = dt.toFormat("YYYY-MM-DD");
+        var formatteddt = dt.format("YYYY-MM-DD");
         var uurl = '';  //availability url for next game
         var member = ''; //member names to display/tell
         var member_id_list = {
@@ -84,8 +83,7 @@ const handlers = {
             for (var i = 0; i < resultjson.collection.items[0].data.length; i++) {
                 if ((resultjson.collection.items[0].data[i].name) == 'start_date') {
                     start_date = resultjson.collection.items[0].data[i].value;
-                    var tdate = new Date(start_date);
-                    start_date = tdate.toFormat("MM-DD");
+                    start_date = new moment(start_date).tz('America/Los_Angeles').format('MMMM Do, h:mm a');
                 }
                 if ((resultjson.collection.items[0].data[i].name) == 'opponent_name') {
                     opponent_name = resultjson.collection.items[0].data[i].value;
